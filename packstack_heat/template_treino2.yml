@@ -1,0 +1,26 @@
+heat_template_version: 2016-10-14
+description: Template para criar VM com parametro. Treino para o exame.
+
+parameters:
+  image:
+    type: string
+    description: Imagem da VM
+
+  network:
+    type: string
+    description: Rede da VM
+
+resources:
+  vm:
+    type: OS::Nova::Server
+    properties:
+      flavor: m1.tiny
+      image: { get_param: image }
+      networks:
+        - network: { get_param: network }
+      name: treino02
+
+outputs:
+  ip_vm:
+    description: IP da VM
+    value: { get_attr: [ vm, first_address ] }

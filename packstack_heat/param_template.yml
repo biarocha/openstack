@@ -1,0 +1,47 @@
+heat_template_version: 2016-10-14
+description: template de teste para criar stack passando parametros
+
+parameters:
+  size:
+    type: string
+    description: Tamanho do disco
+  servername:
+    type: string
+    description: Nome da VM
+
+resources:
+  server01:
+    type: OS::Nova::Server
+    properties:
+      name: { get_param: servername }
+      image: cirros
+      networks:
+        - network: net
+      flavor: m1.tiny
+
+  volume01:
+    type: OS::Cinder::Volume
+    properties:
+      name: volserver01
+      size: { get_param: size }
+
+  att_vol1_server1:
+    type: OS::Cinder::VolumeAttachment
+    properties:
+      instance_uuid: { get_resource: server01 }
+      volume_id: { get_resource: volume01 }
+      mountpoint: /dev/vdb
+
+outputs:
+  name_server01:
+    description: Nome do servidor
+    value: { get_attr: [server01, name] }
+  ip_server01:
+    description: IP do servidor
+    value: { get_attr: [server01, first_address] }
+  nome_vol1:
+    description: Nome do volume
+    value: { get_attr: [volume01, display_name] } 
+  size_vol1:
+    description: Tamanho do volume
+    value: { get_attr: [volume01, size] }

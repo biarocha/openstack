@@ -1,0 +1,43 @@
+heat_template_version: 2016-10-14
+
+description: Teste de deploy de duas instancias
+
+resources:
+  servidor1:
+    type: OS::Nova::Server
+    properties:
+      image: cirros
+      flavor: m1.tiny
+      networks:
+        - network: net
+      name: vm-stack1
+
+  servidor2:
+    type: OS::Nova::Server
+    properties:
+      image: cirros
+      flavor: m1.tiny
+      networks:
+        - network: net
+      name: vm-stack2
+
+  volume1:
+    type: OS::Cinder::Volume
+    properties:
+      size: 1
+      name: vm-stack1-vol
+
+  att:
+    type: OS::Cinder::VolumeAttachment
+    properties:
+      instance_uuid: { get_resource: servidor1 }
+      volume_id: { get_resource: volume1 }
+      mountpoint: /dev/vdb
+
+outputs:
+  server1_ip:
+    description: IP do segundo servidor
+    value: { get_attr: [servidor1, first_address] }
+  server2_ip:
+    description: IP do segundo servidor
+    value: { get_attr: [servidor2, first_address] }

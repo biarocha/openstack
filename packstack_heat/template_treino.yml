@@ -1,0 +1,40 @@
+heat_template_version: 2016-10-14
+
+description: Template para criacao de uma instancia com volume. Treino para o exame.
+
+resources:
+  instancia:
+    type: OS::Nova::Server
+    properties: 
+      name: treino01
+      flavor: m1.tiny
+      image: cirros
+      networks:
+        - network: net
+
+  volume:
+    type: OS::Cinder::Volume
+    properties:
+      name: voltreino
+      size: 1
+
+  attach_vol:
+    type: OS::Cinder::VolumeAttachment
+    properties:
+      instance_uuid: { get_resource: instancia }
+      mountpoint: /dev/vdb
+      volume_id: { get_resource: volume }
+
+  association:
+    type: OS::Nova::FloatingIPAssociation
+    properties:
+      floating_ip: 86fdefb4-5569-4432-a80e-1702811b6bae
+      server_id: { get_resource: instancia }
+
+outputs:
+  ip_instancia:
+    description: IP do servidor
+    value: { get_attr: [instancia, first_address] }
+  volume_tamanho:
+    description: Tamanho do volume
+    value: { get_attr: [volume, size] } 

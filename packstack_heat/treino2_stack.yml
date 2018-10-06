@@ -1,0 +1,40 @@
+heat_template_version: 2016-10-14
+
+description: Outro template de treino
+
+parameters:
+  network:
+    type: string
+    description: Rede a ser utilizada na VM
+
+  image:
+    type: string
+    description: Imagem a ser utilizada na VM
+
+resources:
+  instancia:
+    type: OS::Nova::Server
+    properties:
+      name: stack_server
+      image: { get_param: image }
+      flavor: m1.tiny
+      networks:
+        - network: { get_param: network }
+
+  volume:
+    type: OS::Cinder::Volume
+    properties:
+      name: volume_stack
+      size: 1
+
+  vol_attach:
+    type: OS::Cinder::VolumeAttachment
+    properties:
+      instance_uuid: { get_resource: instancia }
+      volume_id: { get_resource: volume }
+      mountpoint: /dev/vdb
+
+outputs:
+  ip_da_vm:
+    description: IP da instancia
+    value: { get_attr: [ instancia , first_address] }
