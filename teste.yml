@@ -1,0 +1,4 @@
+---
+hosts: localhost
+debug:
+  msg: "Teste"
